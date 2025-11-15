@@ -5,35 +5,34 @@ from actors.gravestone import Gravestone
 from actors.plant import Plant
 from random import randint
 
+import libs.g2d as g2d
+
 BG_WIDTH, BG_HEIGHT = 3588, 250
 W_VIEW, H_VIEW = 400, 220
 
 class GngGui():
-    def __init__(self):
-        self._width, self._height = (BG_WIDTH, BG_HEIGHT)
-        self._w_view, self._h_view = (W_VIEW, H_VIEW)
+    def __init__(self, arena: Arena | None):
         self._x_view, self._y_view = 0, 0
+        self._arena = arena
 
-        self._arena = Arena((self._w_view, self._h_view), (self._width, self._height))
-        self._status = (False, "")
+        g2d.init_canvas((W_VIEW, H_VIEW), 2)
+        g2d.main_loop(self.tick)
 
     def tick(self):
         g2d.clear_canvas()
         g2d.set_color((0,0,0))
-        g2d.draw_image("./imgs/background.png", (0, 0), (self._x_view, self._y_view), (self._w_view, self._h_view))
+        g2d.draw_image("./imgs/background.png", (0, 0), (self._x_view, self._y_view), (W_VIEW, H_VIEW))
 
-        # da spostare in gng-game
-        finished, winner = self.get_status()
+        finished, winner = self._arena.get_status()
         if finished:
             self.show_result(winner)
             return
 
-        # movimento della telecamera
         keys = self._arena.current_keys()
         if "left" in keys and self._x_view > 0:
             self._x_view = max(0, self._x_view - 5)
-        elif "right" in keys and self._x_view < BG_WIDTH - self._w_view:
-            self._x_view = min(BG_WIDTH - self._w_view, self._x_view + 5)
+        elif "right" in keys and self._x_view < BG_WIDTH - W_VIEW:
+            self._x_view = min(BG_WIDTH - W_VIEW, self._x_view + 5)
 
         for a in self._arena.actors():
             ax, ay = a.pos()
@@ -61,8 +60,8 @@ class GngGui():
                 margin = 50
                 if ax - self._x_view < margin:
                     self._x_view = max(0, ax - margin)
-                elif ax - self._x_view > self._w_view - margin:
-                    self._x_view = min(BG_WIDTH - self._w_view, ax - (self._w_view - margin))
+                elif ax - self._x_view > W_VIEW - margin:
+                    self._x_view = min(BG_WIDTH - W_VIEW, ax - (W_VIEW - margin))
             else:
                 if a.sprite() != None:
                     g2d.draw_image(
@@ -74,42 +73,64 @@ class GngGui():
 
         self._arena.tick(g2d.current_keys())
 
-    def set_status(self, status, winner):
-        self._status = (status, winner)
-
-    def get_status(self):
-        return self._status
-
-    def view_size(self):
-        return (self._w_view, self._h_view)
-
     def show_result(self, winner):
         if winner == "Monster":
             g2d.draw_image("./imgs/lose.png", (0, 0))
         else:
             g2d.draw_image("./imgs/win.png", (0, 0))
 
-def tick():
-    gui.tick()
+class GngGame(Arena):
+    def __init__(self):
+        super().__init__((W_VIEW, H_VIEW), (BG_WIDTH, BG_HEIGHT))
+
+        self._status = (False, "")
+        self._current_song_src = None
+        self._lives = 3
+
+        # crea i personaggi
+        self.spawn(Arthur((0, 170)))
+        for x in [50, 242, 530, 754, 962, 1106]:
+            self.spawn(Gravestone((x, 185)))
+        for x, y in [(1108, 98)]:
+            self.spawn(Plant((x, y)))
+
+        # gestisce la canzone iniziale
+        self.set_song("./audio/start.mp3")
+        self.start_song()
+
+    def get_song(self):
+        return self._current_song_src
+
+    def get_song_src(self) -> str | None:
+        return self._current_song_src
+
+    def set_song(self, song_src: str):
+        if self._current_song_src is not None:
+            g2d.pause_audio(self._current_song_src)
+        self._current_song_src = song_src
+
+    def start_song(self):
+        g2d.play_audio(self._current_song_src)
+
+    def give_lives(self, amount = 1):
+        self._lives += amount
+
+    def decrease_lives(self):
+        self._lives -= 1
+
+    def get_lives(self):
+        return self._lives
+
+    def set_status(self, status, winner):
+        self._status = (status, winner)
+
+    def get_status(self):
+        return self._status
 
 def main():
-    global g2d, gui
-    import libs.g2d as g2d
-
-    gui = GngGui()
-
-    gui._arena.spawn(Arthur((0, 170)))
-    for x in [50, 242, 530, 754, 962, 1106]: # posizioni delle tombe
-        gui._arena.spawn(Gravestone((x, 185)))
-
-    for x,y in [(1108, 98)]:
-        gui._arena.spawn(Plant((x, y)))
-
-    g2d.init_canvas(gui.view_size(), 2)
-    gui._arena.set_song("./audio/start.mp3")
-    gui._arena.start_song()
-
-    g2d.main_loop(tick)
+    global gui
+    game = GngGame()
+    gui = GngGui(game)
 
 if __name__ == "__main__":
     main()

@@ -118,7 +118,7 @@ class Arthur(Actor):
                 arena.kill(obj)
                 if arena.get_lives() == 0:
                     arena.kill(self)
-                    arena.set_status(False, "Monster")
+                    arena.set_status(True, "Monster")
 
             elif isinstance(obj, Gravestone):
                 obj_x, obj_y = obj.pos()
