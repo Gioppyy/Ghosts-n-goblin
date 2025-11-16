@@ -1,6 +1,6 @@
 from libs.actor import Arena
 import libs.g2d as g2d
-from actors.arthur import Arthur
+from actors.arthurold import Arthur
 from actors.princess import Princess, Devil
 from actors.gravestone import Platform
 
@@ -107,6 +107,7 @@ def handle_armor_state():
 def handle_end_state():
     try:
         import main as game_main
+        g2d.pause_audio("./audio/intro.mp3")
         game_main.main()
     except Exception as e:
         print(e)
@@ -125,6 +126,8 @@ def tick():
     global state
 
     g2d.clear_canvas()
+
+    handle_end_state()
 
     # Handle game states
     if state == STATE_WAIT:
@@ -172,7 +175,7 @@ def main():
     g2d.init_canvas((W_VIEW, H_VIEW), 2)
 
     try:
-        g2d.play_audio("./audio/start.mp3", loop=True, volume=0.06)
+        g2d.play_audio("./audio/intro.mp3", loop=True, volume=0.06)
     except Exception as e:
         print(e)
         pass

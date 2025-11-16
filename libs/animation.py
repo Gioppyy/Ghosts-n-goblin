@@ -1,41 +1,48 @@
 class Animation:
-    def __init__(self, frames, speed, loop=True):
-        self.frames = frames
-        self.speed = speed
-        self.loop = loop
-        self.tick = 0
-        self.index = 0
-        self.playing = False
+    def __init__(self, frames, speed=1, loop=True, on_complete=None, on_update=None):
+        self._frames = frames
+        self._speed = speed
+        self._loop = loop
+        self._on_complete = on_complete
+        self._on_update = on_update
+        self._current_frame = 0
+        self._tick = 0
+        self._active = False
+        self._completed = False
 
-    def start(self, frames=None, speed=None, loop=True):
-        if frames is not None:
-            self.frames = frames
-        if speed is not None:
-            self.speed = speed
-            self.loop = loop
-            self.tick = 0
-            self.index = 0
-            self.playing = True
+    def start(self):
+        self._active = True
+        self._completed = False
+        self._current_frame = 0
+        self._tick = 0
+        return self._frames[self._current_frame]
 
     def stop(self):
-        self.playing = False
-        self.index = 0
-        self.tick = 0
+        self._active = False
 
     def update(self):
-        if not self.playing:
-            return self.frames[self.index]
+        if not self._active or self._completed:
+            return
 
-        self.tick += 1
-        if self.tick >= self.speed:
-            self.tick = 0
-            self.index += 1
+        self._tick += 1
+        if self._tick >= self._speed:
+            self._tick = 0
+            self._current_frame += 1
+            if self._on_update:
+                self._on_update()
 
-        if self.index >= len(self.frames):
-            if self.loop:
-                self.index = 0
-            else:
-                self.index = len(self.frames) - 1
-                self.playing = False
+            if self._current_frame >= len(self._frames):
+                if self._loop:
+                    self._current_frame = 0
+                else:
+                    self._current_frame = len(self._frames) - 1
+                    self._completed = True
+                    if self._on_complete:
+                        self._on_complete()
+        return self._frames[self._current_frame]
 
-        return self.frames[self.index]
+    def frames(self):
+        return self._frames
+
+    def is_active(self):
+        return self._active and not self._completed

@@ -10,29 +10,21 @@ LEFT_DEFAULT = ((485, 45), (20, 30))
 JUMP_RIGHT = ((144, 29), (32, 27))
 JUMP_LEFT = ((336, 29), (32, 27))
 
-JUMP_COOLDOWN = 20
-JUMP_DURATION = 10
-
-TORCH_COOLDOWN = 15
-TORCH_DURATION = 10
-
 class Arthur(Actor):
     def __init__(self, pos):
         self._x, self._y = pos
         self._dx, self._dy = 5, 15
         self._sprite, self._size = DEFAULT # fermo
+
         self._facing = "right"
 
-        self._jumping = False
-        self._jump_time = 0
-        self._jump_cooldown_time = 0
-        self._jump_in_cooldown = False
+        self._torch_cooldown = 0 # cooldown per la torcia
 
-        self._torch = False
-        self._torch_time = 0
-        self._torch_cooldown_time = 0
-        self._torch_in_cooldown = False
-        self._throw_animation = None
+        self._jumping = False
+
+        self._animation = False
+        self._animation_tick = 0
+        self._animation_cooldown = 0
 
         # variabili per la camminata
         self._walk_right = Animation(
@@ -44,21 +36,49 @@ class Arthur(Actor):
             speed=5, loop=True
         )
 
-        self._throw_right = Animation([((4, 133), (25, 30)), ((29, 133), (25, 30))], speed=4)
-        self._throw_left = Animation([((483, 133), (25, 30)), ((456, 133), (25, 30))], speed=4)
+        self._throw_frame = 0
+        self._throw_right = [((4, 133), (25, 30)), ((29, 133), (25, 30))]
+        self._throw_left = [((483, 133), (25, 30)), ((456, 133), (25, 30))]
+
+        self._walk_frame = 0
+        self._walk_tick = 0
+        self._walk_speed = 5  # ogni 5 tick cambia frame
 
         self._on_ladder = False
 
     def move(self, arena: Arena):
-        old_x, old_y = self._x, self._y
+        aw, ah = arena.size()
         keys = arena.current_keys()
 
-        self._handle_movement(keys, arena)
-        self._handle_jump(keys, arena)
-        self._handle_torch(keys, arena)
-        self._handle_collision(keys, arena, old_x, old_y)
+        if self._torch_cooldown > 0:
+            self._torch_cooldown -= 1
 
-    def _handle_collision(self, keys, arena, old_x, old_y):
+        if self._animation_tick > 0:
+            self._animation_tick -= 1
+
+            if self._animation == "throw":
+                if self._animation_tick == 4:
+                    self._throw_frame = 1
+                    frames = self._throw_right if self._facing == "right" else self._throw_left
+                    self._sprite, self._size = frames[self._throw_frame]
+
+                if self._animation_tick == 0:
+                    self._animation = False
+                    self._sprite, self._size = (DEFAULT if self._facing == "right" else LEFT_DEFAULT)
+                return
+
+            if self._animation_tick == 0:
+                self._animation = False
+                self._sprite, self._size = (DEFAULT if self._facing == "right" else LEFT_DEFAULT)
+                self._y += self._dy
+                self._animation_cooldown = 30
+
+        if self._animation_cooldown > 0:
+            self._animation_cooldown -= 1
+
+        old_x, old_y = self._x, self._y
+
+
         for obj in arena.collisions():
             if isinstance(obj, Zombie) or isinstance(obj, Eyeball):
                 arena.decrease_lives()
@@ -132,86 +152,13 @@ class Arthur(Actor):
                 if (self._x < obj_x + obj_w and self._x + arthur_w > obj_x and
                     self._y + arthur_h > obj_y and self._y + arthur_h < obj_y + obj_h):
                     self._y = obj_y - arthur_h
-        pass
 
-    def _handle_torch(self, keys, arena):
-        current_tick = arena.count()
-        if self._torch:
-            if current_tick - self._torch_time >= TORCH_DURATION:
-                self._torch = False
-                self.reset_sprite()
-                self._torch_in_cooldown = True
-                self._torch_cooldown_time = current_tick
-                self._throw_animation.stop()
-            else:
-                self._sprite, self._size = self._throw_animation.update()
-
-        if current_tick - self._torch_cooldown_time >= TORCH_COOLDOWN:
-            self._torch_in_cooldown = False
-
-        if "f" in keys:
-            if not self._torch and not self._torch_in_cooldown:
-                arena.spawn(Torch(self.pos(), self._facing))
-                self._torch = True
-                self._torch_time = current_tick
-
-                self._throw_animation = self._throw_right if self._facing == "right" else self._throw_left
-                self._sprite, self._size = self._throw_animation.start()
-
-    def _handle_jump(self, keys, arena):
-        if self._jumping and arena.count() - self._jump_time >= JUMP_DURATION:
-            self._y += self._dy
-            self._jumping = False
-            self.reset_sprite()
-            self._jump_in_cooldown = True
-            self._jump_cooldown_time = arena.count()
-
-        if arena.count() - self._jump_cooldown_time >= JUMP_COOLDOWN:
-            self._jump_in_cooldown = False
-
-        if "w" in keys and not self._on_ladder:
-            if not self._jumping and not self._jump_in_cooldown:
-                self._y -= self._dy
-                self._jumping = True
-                self._jump_time = arena.count()
-                self._sprite, self._size = (
-                    JUMP_RIGHT if self._facing == "right" else JUMP_LEFT
-                )
-
-    def _handle_movement(self, keys, arena):
-        aw, _ = arena.size()
-
-        if "d" in keys:
-            self._x = min((self._x + self._dx), aw)
-            self._facing = "right"
-
-            self._walk_left.stop()
-            if not self._walk_right.is_active():
-                self._walk_right.start()
-
-            if not self._jumping:
-                 self._sprite, self._size = self._walk_right.update()
-            else:
-                self._sprite, self._size = JUMP_RIGHT
-
-        elif "a" in keys:
-            self._x = max(0, (self._x - self._dx))
-            self._facing = "left"
-
-            self._walk_right.stop()
-            if not self._walk_left.is_active():
-                self._walk_left.start()
-
-            if not self._jumping:
-                 self._sprite, self._size = self._walk_left.update()
-            else:
-                self._sprite, self._size = JUMP_LEFT
-        else:
-            if not self._jumping:
-                self.reset_sprite()
-
-    def reset_sprite(self):
-        self._sprite, self._size = DEFAULT if self._facing == "right" else LEFT_DEFAULT
+    def update_walk_animation(self, frames):
+        self._walk_tick += 1
+        if self._walk_tick >= self._walk_speed:
+            self._walk_tick = 0
+            self._walk_frame = (self._walk_frame + 1) % len(frames)
+        self._sprite, self._size = frames[self._walk_frame]
 
     def pos(self) -> Point:
         return (self._x, self._y)

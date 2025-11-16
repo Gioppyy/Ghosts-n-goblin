@@ -1,12 +1,12 @@
-from libs.actor import Actor, Arena, Point
-from random import randint
+from libs.actor import Actor, Point
+from random import randint, random
 
 class Plant(Actor):
     def __init__(self, pos: Point):
         self._x, self._y = pos
 
     def move(self, arena):
-        if randint(0, 200) == 100:
+        if randint(0, 10) == 2:
             arena.spawn(Eyeball(self.pos(), "left"))
 
     def pos(self) -> Point:
@@ -24,10 +24,15 @@ class Eyeball(Actor):
         self._x, self._y = pos
         self._dir = direction
         self._dx = 3 if self._dir == "right" else -3
+        self._dy = random() + 1
+        print(self._dy)
 
     def move(self, arena):
         self._x += self._dx
-        if self._x < 0:
+
+        self._y += self._dy
+
+        if self._x < 0 or self._y >= 200:
             arena.kill(self)
 
     def pos(self) -> Point:

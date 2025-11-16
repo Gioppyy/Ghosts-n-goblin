@@ -1,13 +1,14 @@
 from libs.actor import Arena
 from actors.arthur import Arthur
 from actors.zombie import Zombie
-from actors.gravestone import Gravestone
+from actors.gravestone import Gravestone, Ladder, Platform
 from actors.plant import Plant
 from random import randint
 
 import libs.g2d as g2d
 
 BG_WIDTH, BG_HEIGHT = 3588, 250
+CHANGE_SONG_X = 1794
 W_VIEW, H_VIEW = 400, 220
 
 class GngGui():
@@ -38,7 +39,7 @@ class GngGui():
             ax, ay = a.pos()
             if isinstance(a, Arthur):
 
-                if ax >= 1794 and ("start" in self._arena.get_song_src()):
+                if ax >= CHANGE_SONG_X and ("start" in self._arena.get_song_src()):
                     self._arena.set_song("./audio/end.mp3")
                     self._arena.start_song()
 
@@ -49,13 +50,12 @@ class GngGui():
                     zx = ax + diff * (1 if direction == 0 else -1)
                     self._arena.spawn(Zombie((max(0, zx), 170), direction))
 
-                if a.sprite != None:
-                    g2d.draw_image(
-                        "./imgs/sprites.png",
-                        (ax - self._x_view, ay - self._y_view),
-                        a.sprite(),
-                        a.size(),
-                    )
+                g2d.draw_image(
+                    "./imgs/sprites.png",
+                    (ax - self._x_view, ay - self._y_view),
+                    a.sprite(),
+                    a.size(),
+                )
 
                 margin = 50
                 if ax - self._x_view < margin:
@@ -87,12 +87,17 @@ class GngGame(Arena):
         self._current_song_src = None
         self._lives = 3
 
+        self.spawn(Platform((0, 205), (3588, 30))) # piattaforma di base
+        self.spawn(Platform((610, 120), (525, 15))) # piattaforma centrale
+
         # crea i personaggi
         self.spawn(Arthur((0, 170)))
         for x in [50, 242, 530, 754, 962, 1106]:
             self.spawn(Gravestone((x, 185)))
         for x, y in [(1108, 98)]:
             self.spawn(Plant((x, y)))
+        for x in [722, 914, 1074]: # posizioni delle tombe
+            self.spawn(Ladder((x, 122)))
 
         # gestisce la canzone iniziale
         self.set_song("./audio/start.mp3")

@@ -44,7 +44,7 @@ class Ladder(Actor):
         return (self._x, self._y)
 
     def size(self) -> Point:
-        return (17, 80)
+        return (17, 100)
 
     def sprite(self) -> Point | None:
         return None
