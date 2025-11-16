@@ -1,9 +1,9 @@
 from libs.actor import Actor, Arena, Point
 from actors.zombie import Zombie
-from actors.gravestone import Platform
+from actors.gravestone import Gravestone
 from libs.animation import Animation
 
-GROUND_Y = 170
+GROUND_Y = 180
 
 class Torch(Actor):
     def __init__(self, pos, direction):
@@ -27,6 +27,10 @@ class Torch(Actor):
             if isinstance(other, Zombie):
                 arena.kill(other)
                 arena.kill(self)
+            if isinstance(other, Gravestone):
+                arena.spawn(Particle(other.pos()))
+                arena.kill(self)
+                other.hit()
 
         if self._y >= GROUND_Y:
             arena.spawn(Flame(self.pos()))
@@ -53,6 +57,7 @@ class Flame(Actor):
     def move(self, arena: Arena):
         self._cooldown -= 1
         if self._cooldown == 0:
+            self._anim.stop()
             arena.kill(self)
             return
 
@@ -64,6 +69,29 @@ class Flame(Actor):
 
     def move_down(self):
         self._y += 8
+
+    def pos(self) -> Point:
+        return (self._x, self._y)
+
+    def size(self) -> Point:
+        return self._size
+
+    def sprite(self) -> Point | None:
+        return self._sprite
+
+class Particle(Actor):
+    def __init__(self, pos):
+        self._x, self._y = pos
+        self._anim = Animation([((146, 359), (9,9)), ((157, 358), (11, 11)), ((170, 356), (15, 15))], speed=5, loop=False)
+        self._sprite, self._size = self._anim.start()
+        self._cooldown = 15
+
+    def move(self, arena: Arena):
+        self._cooldown -= 1
+        if self._cooldown == 0:
+            arena.kill(self)
+            return
+        self._sprite, self._size = self._anim.update()
 
     def pos(self) -> Point:
         return (self._x, self._y)

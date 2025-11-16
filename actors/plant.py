@@ -25,11 +25,9 @@ class Eyeball(Actor):
         self._dir = direction
         self._dx = 3 if self._dir == "right" else -3
         self._dy = random() + 1
-        print(self._dy)
 
     def move(self, arena):
         self._x += self._dx
-
         self._y += self._dy
 
         if self._x < 0 or self._y >= 200:

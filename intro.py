@@ -1,11 +1,11 @@
 from libs.actor import Arena
 import libs.g2d as g2d
-from actors.arthurold import Arthur
+from actors.arthur import Arthur
 from actors.princess import Princess, Devil
 from actors.gravestone import Platform
 
 # Constants
-W_VIEW, H_VIEW = 400, 220
+W_VIEW, H_VIEW = 400, 270
 BG_WIDTH, BG_HEIGHT = 3588, 250
 
 ARTHUR_JUMP_LEFT = ((336, 29), (32, 27))

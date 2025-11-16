@@ -10,6 +10,7 @@ import libs.g2d as g2d
 BG_WIDTH, BG_HEIGHT = 3588, 250
 CHANGE_SONG_X = 1794
 W_VIEW, H_VIEW = 400, 220
+LIVE_IMG_SIZE = 13
 
 class GngGui():
     def __init__(self, arena: Arena | None):
@@ -34,6 +35,9 @@ class GngGui():
             self._x_view = max(0, self._x_view - 5)
         elif "right" in keys and self._x_view < BG_WIDTH - W_VIEW:
             self._x_view = min(BG_WIDTH - W_VIEW, self._x_view + 5)
+
+        for live in range(self._arena.get_lives()):
+            g2d.draw_image("./imgs/sprites.png", (10+LIVE_IMG_SIZE*live, 210), (696, 696), (LIVE_IMG_SIZE, LIVE_IMG_SIZE))
 
         for a in self._arena.actors():
             ax, ay = a.pos()
