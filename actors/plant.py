@@ -6,7 +6,7 @@ class Plant(Actor):
         self._x, self._y = pos
 
     def move(self, arena):
-        if randint(0, 10) == 2:
+        if randint(0, 200) == 100:
             arena.spawn(Eyeball(self.pos(), "left"))
 
     def pos(self) -> Point:

@@ -6,7 +6,7 @@ from actors.gravestone import Platform
 
 # Constants
 W_VIEW, H_VIEW = 400, 270
-BG_WIDTH, BG_HEIGHT = 3588, 250
+BG_WIDTH, BG_HEIGHT = 3588, 230
 
 ARTHUR_JUMP_LEFT = ((336, 29), (32, 27))
 ARTHUR_ARMOR = ((80, 170), (25, 30))
@@ -119,7 +119,7 @@ def draw_actors():
         spr = actor.sprite()
         size = actor.size()
         if spr is not None:
-            g2d.draw_image("./imgs/sprites.png", (ax, ay), spr, size)
+            g2d.draw_image("./imgs/sprites_nostro.png", (ax, ay), spr, size)
 
 
 def tick():
@@ -127,7 +127,7 @@ def tick():
 
     g2d.clear_canvas()
 
-    handle_end_state()
+    #handle_end_state()
 
     # Handle game states
     if state == STATE_WAIT:

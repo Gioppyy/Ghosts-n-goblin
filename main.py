@@ -37,7 +37,7 @@ class GngGui():
             self._x_view = min(BG_WIDTH - W_VIEW, self._x_view + 5)
 
         for live in range(self._arena.get_lives()):
-            g2d.draw_image("./imgs/sprites.png", (10+LIVE_IMG_SIZE*live, 210), (696, 696), (LIVE_IMG_SIZE, LIVE_IMG_SIZE))
+            g2d.draw_image("./imgs/sprites_nostro.png", (10+LIVE_IMG_SIZE*live, 210), (696, 696), (LIVE_IMG_SIZE, LIVE_IMG_SIZE))
 
         for a in self._arena.actors():
             ax, ay = a.pos()
@@ -55,7 +55,7 @@ class GngGui():
                     self._arena.spawn(Zombie((max(0, zx), 170), direction))
 
                 g2d.draw_image(
-                    "./imgs/sprites.png",
+                    "./imgs/sprites_nostro.png",
                     (ax - self._x_view, ay - self._y_view),
                     a.sprite(),
                     a.size(),
@@ -69,7 +69,7 @@ class GngGui():
             else:
                 if a.sprite() != None:
                     g2d.draw_image(
-                        "./imgs/sprites.png",
+                        "./imgs/sprites_nostro.png",
                         (ax - self._x_view, ay - self._y_view),
                         a.sprite(),
                         a.size(),
