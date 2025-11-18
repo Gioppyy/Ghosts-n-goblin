@@ -48,7 +48,7 @@ class Ladder(Actor):
         pass
 
     def pos(self) -> Point:
-        return (self._x, self._y)
+        return (self._x, self._y-20)
 
     def size(self) -> Point:
         return (17, 100)

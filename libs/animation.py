@@ -41,6 +41,9 @@ class Animation:
                         self._on_complete()
         return self._frames[self._current_frame]
 
+    def set_on_complete(self, on_complete):
+        self._on_complete = on_complete
+
     def frames(self):
         return self._frames
 

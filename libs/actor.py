@@ -60,6 +60,7 @@ class Arena():
         self._collisions = []
         self._score = 0
         self._level = 0
+        self._intro_running = False
 
     def spawn(self, a: Actor):
         """Register an actor into this arena.
@@ -98,6 +99,12 @@ class Arena():
             if isinstance(a, type):
                 count += 1
         return count
+
+    def set_intro_running(self, title_running):
+        self._intro_running = title_running
+
+    def get_intro_running(self):
+        return self._intro_running
 
     def get_by_type(self, type):
         for a in self._actors:
