@@ -41,11 +41,11 @@
         },
         "song_change_x": 1794,
         "zombie_spawn": {
-            "chance": 500,
-            "target": 250,
+            "chance": 250,
+            "target": 125,
             "distance_min": 50,
             "distance_max": 200,
-            "y_position": 170
+            "y_position": 175
         }
     },
     "level": {
@@ -75,7 +75,7 @@
             {"x": 914, "y": 122},
             {"x": 1074, "y": 122}
         ],
-        "arthur_start": [0, 170]
+        "arthur_start": [0, 175]
     },
     "gameover": {
         "animation": {
@@ -182,7 +182,7 @@
         "speed_x": 4,
         "speed_y_initial": -3,
         "gravity": 0.3,
-        "ground_y": 180,
+        "ground_y": 145,
         "animations": {
             "flying": {
                 "frames": [[[19, 400], [14, 14]], [[39, 400], [14, 14]], [[58, 400], [14, 14]], [[77, 400], [14, 14]]],

@@ -1,5 +1,5 @@
 from libs.actor import Actor, Point
-from random import randint, random
+from random import randint, random, choice
 
 class Plant(Actor):
     def __init__(self, pos: Point, arena=None):
@@ -20,7 +20,7 @@ class Plant(Actor):
 
     def move(self, arena):
         if randint(0, self._spawn_chance) == self._spawn_target:
-            arena.spawn(Eyeball(self.pos(), "left", arena))
+            arena.spawn(Eyeball(self.pos(), choice(["right", "left"]), arena))
 
     def pos(self) -> Point:
         return (self._x, self._y)

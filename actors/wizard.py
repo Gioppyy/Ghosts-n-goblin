@@ -2,14 +2,28 @@ from libs.actor import Actor, Point, Arena
 from libs.animation import Animation
 
 class Wizard(Actor):
-    def __init__(self, pos):
+    def __init__(self, pos, arena=None):
         self._x, self._y = pos
 
-        self._anim = Animation([((544, 900), (20, 33)), ((584, 900), (19, 33)), ((615, 900), (37, 33)),((654, 900), (35, 33))], speed=15, loop=True)
+        if arena is None:
+            frames = [((544, 900), (20, 33)), ((584, 900), (19, 33)), ((615, 900), (37, 33)), ((654, 900), (35, 33))]
+            speed = 15
+            self._cooldown = 60
+            offset_y = -15
+        else:
+            settings = arena.get_settings()
+            wizard_config = settings.get_actor_config('wizard')
 
+            anim_data = settings.get_animation_data('wizard', 'cast')
+            frames = anim_data['frames']
+            speed = anim_data['speed']
+
+            self._cooldown = wizard_config['cooldown']
+            offset_y = wizard_config['offset_y']
+
+        self._anim = Animation(frames, speed=speed, loop=True)
         self._sprite, self._size = self._anim.start()
-        self._y -= 15
-        self._cooldown = 60
+        self._y += offset_y
 
     def move(self, arena: Arena):
         self._cooldown -= 1

@@ -16,7 +16,7 @@ class Torch(Actor):
             self._speed_x = 4
             self._speed_y_initial = -3
             self._gravity = 0.3
-            self._ground_y = 180
+            self._ground_y = 175
         else:
             settings = arena.get_settings()
             torch_config = settings.get_actor_config('torch')

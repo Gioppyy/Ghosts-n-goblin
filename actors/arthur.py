@@ -9,7 +9,6 @@ class Arthur(Actor):
     def __init__(self, pos, arena=None):
         self._x, self._y = pos
 
-        # Se arena è None, usa valori di default (per compatibilità)
         if arena is None:
             self._init_default()
         else:
@@ -29,7 +28,6 @@ class Arthur(Actor):
         self._on_ladder = False
 
     def _init_default(self):
-        """Inizializzazione con valori di default (fallback)"""
         self._dx, self._dy = 5, 15
         self._sprite, self._size = ((5, 45), (20, 30))
         self._default_right = ((5, 45), (20, 30))
@@ -154,7 +152,16 @@ class Arthur(Actor):
 
     def _handle_collision(self, keys, arena, old_x, old_y):
         for obj in arena.collisions():
-            if isinstance(obj, Zombie) or isinstance(obj, Eyeball):
+            if isinstance(obj, Zombie):
+                pass
+                #if not obj.is_harmless():
+                    #arena.decrease_lives()
+                    #arena.kill(obj)
+                    #if arena.get_lives() == 0:
+                    #    arena.kill(self)
+                    #    arena.set_status(True, "Monster")
+
+            elif isinstance(obj, Eyeball):
                 arena.decrease_lives()
                 arena.kill(obj)
                 if arena.get_lives() == 0:
@@ -250,6 +257,9 @@ class Arthur(Actor):
 
     def _handle_torch(self, keys, arena):
         current_tick = arena.count()
+        if self._on_ladder:
+            return
+
         if self._torch:
             if current_tick - self._torch_time >= self._torch_duration:
                 self._torch = False
