@@ -146,6 +146,9 @@ class Arthur(Actor):
         self._handle_collision(keys, arena, old_x, old_y)
         self._handle_gravity()
 
+        if self._x >= 3458:
+            arena.set_status(True, "Arthur")
+
     def _handle_gravity(self):
         if self._y < 170 and not self._on_ladder:
             self._y = min(170, self._y + 3)
@@ -154,12 +157,13 @@ class Arthur(Actor):
         for obj in arena.collisions():
             if isinstance(obj, Zombie):
                 pass
-                #if not obj.is_harmless():
-                    #arena.decrease_lives()
-                    #arena.kill(obj)
-                    #if arena.get_lives() == 0:
-                    #    arena.kill(self)
-                    #    arena.set_status(True, "Monster")
+                if not obj.is_harmless():
+                    arena.increment_score(-20)
+                    arena.decrease_lives()
+                    arena.kill(obj)
+                    if arena.get_lives() == 0:
+                        arena.kill(self)
+                        arena.set_status(True, "Monster")
 
             elif isinstance(obj, Eyeball):
                 arena.decrease_lives()

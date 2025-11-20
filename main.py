@@ -9,7 +9,6 @@ W_VIEW, H_VIEW = 400, 220
 BG_WIDTH, BG_HEIGHT = 3588, 230
 
 ARTHUR_JUMP_LEFT = ((336, 29), (32, 27))
-ARTHUR_ARMOR = ((80, 170), (25, 30))
 ARTHUR_JUMP_DURATION = 24
 
 class State:
@@ -43,6 +42,8 @@ class Intro:
         self._devil_spawned = False
         self._arthur_jump_tick = 0
         self._armor_timer = 0
+
+        self._song_started = False
 
     def draw_actors(self):
         for actor in self._arena.actors():
@@ -86,12 +87,16 @@ class Intro:
             self._handle_end_state()
 
     def _handle_enter_state(self):
-        g2d.draw_image("./imgs/title_screen.png", (0, 0), (0, 0), (W_VIEW, H_VIEW))
+        g2d.draw_image("./imgs/title_screen.png", (0, 0), (220, 30), (W_VIEW, H_VIEW))
         keys = g2d.current_keys()
         if "return" in keys:
             self._state = State.WAIT
 
     def _handle_wait_state(self):
+        if not self._song_started:
+            g2d.play_audio("./audio/intro.mp3", loop=True, volume=0.06)
+            self._song_started = True
+
         g2d.draw_image("./imgs/background.png", (0, 0), (0, 0), (W_VIEW, H_VIEW))
         self._wait_tick += 1
         if self._wait_tick > 40:
@@ -138,7 +143,7 @@ class Intro:
             self._state = State.ARMOR
 
     def _handle_armor_state(self):
-        self._arthur._sprite, self._arthur._size = ARTHUR_ARMOR
+        self._arthur._sprite, self._arthur._size = ((5, 45), (20, 30))
         self._armor_timer += 1
         if self._armor_timer > 40:
             self._state = State.END
@@ -157,7 +162,6 @@ class Intro:
 
 def main():
     g2d.init_canvas((W_VIEW, H_VIEW), 2)
-    g2d.play_audio("./audio/intro.mp3", loop=True, volume=0.06)
 
     intro = Intro()
     g2d.main_loop(intro.tick)

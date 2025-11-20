@@ -8,7 +8,8 @@ class Gravestone(Actor):
 
     def move(self, arena):
         if self._hitted == 10:
-            arena.spawn(Wizard(self.pos()))
+            gx, gy = self.pos()
+            arena.spawn(Wizard((gx, gy-15)))
             self._hitted = 0
 
     def hit(self):

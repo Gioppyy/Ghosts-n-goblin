@@ -58,7 +58,6 @@ class Arena():
         self._actors = []
         self._curr_keys = self._prev_keys = tuple()
         self._collisions = []
-        self._score = 0
         self._level = 0
         self._intro_running = False
 
@@ -111,12 +110,6 @@ class Arena():
             if isinstance(a, type):
                 return a
         return None
-
-    def set_score(self, score: int):
-        self._score = score
-
-    def get_score(self) -> (int):
-        return self._score
 
     def increase_level(self):
         self._level += 1

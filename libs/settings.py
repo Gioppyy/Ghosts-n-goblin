@@ -94,3 +94,6 @@ class Settings:
     # Gameover
     def get_gameover_config(self):
         return self._config['gameover']
+
+    def get_gamewin_config(self):
+        return self._config['gamewin']

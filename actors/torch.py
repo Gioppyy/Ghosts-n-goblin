@@ -49,6 +49,7 @@ class Torch(Actor):
             if isinstance(other, Zombie):
                 arena.kill(other)
                 arena.kill(self)
+                arena.increment_score(150)
             if isinstance(other, Gravestone):
                 arena.spawn(Particle(other.pos(), arena))
                 arena.kill(self)
@@ -106,6 +107,7 @@ class Flame(Actor):
 
         for other in arena.collisions():
             if isinstance(other, Zombie):
+                arena.increment_score(100)
                 arena.kill(other)
 
     def move_down(self):

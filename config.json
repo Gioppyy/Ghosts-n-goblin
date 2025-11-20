@@ -8,7 +8,7 @@
         "win": "./imgs/win.png"
     },
     "audio": {
-        "start": "./audio/start.mp3",
+        "start": "https://vgmtreasurechest.com/soundtracks/ghosts-n-goblins-arcade/algyyvgx/04%20Ground%20BGM%20%281%2C%202%20Stage%29.mp3",
         "end": "./audio/end.mp3"
     },
     "keys": {
@@ -79,11 +79,19 @@
     },
     "gameover": {
         "animation": {
-            "frames": [[[1, 1], [97, 32]], [[2, 41], [135, 25]], [[2, 75], [135, 24]], [[1, 116], [135, 16]]],
+            "frames": [[[2, 3], [182, 52]], [[2, 66], [212, 41]], [[2, 121], [212, 36]], [[2, 183], [214, 26]]],
             "speed": 20,
             "loop": false
         },
-        "position": [150, 110]
+        "position": [100, 100]
+    },
+    "gamewin": {
+        "animation": {
+            "frames": [[[2, 9], [162, 50]], [[2, 66], [180, 43]], [[2, 119], [178, 43]], [[2, 180], [180, 28]]],
+            "speed": 20,
+            "loop": false
+        },
+        "position": [100, 100]
     },
     "arthur": {
         "sprites": {
